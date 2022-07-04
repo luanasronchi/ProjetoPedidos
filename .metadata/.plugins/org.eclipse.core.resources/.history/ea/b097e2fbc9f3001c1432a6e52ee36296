@@ -1,0 +1,126 @@
+import java.awt.EventQueue;
+
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.awt.event.ActionEvent;
+
+public class JanelaAdicionar extends JInternalFrame {
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					JanelaAdicionar frame = new JanelaAdicionar();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public JanelaAdicionar() {
+		setClosable(true);
+		setBounds(100, 100, 250, 150);
+		getContentPane().setLayout(null);
+		
+		JLabel lblNewLabel = new JLabel("Produto:");
+		lblNewLabel.setBounds(10, 11, 46, 14);
+		getContentPane().add(lblNewLabel);
+		
+		JLabel lblQuantidade = new JLabel("Quantidade:");
+		lblQuantidade.setBounds(10, 40, 60, 14);
+		getContentPane().add(lblQuantidade);
+		
+		JLabel lblNewLabel_1_1 = new JLabel("Total:");
+		lblNewLabel_1_1.setBounds(10, 78, 46, 14);
+		getContentPane().add(lblNewLabel_1_1);
+		
+		JComboBox produto = new JComboBox();
+		produto.setModel(new DefaultComboBoxModel(new String[] {"A\u00E7a\u00ED Pequeno", "A\u00E7a\u00ED M\u00E9dio", "A\u00E7a\u00ED Grande", "Brigadeiro", "Bolo"}));
+		produto.setBounds(81, 7, 127, 22);
+		getContentPane().add(produto);
+		
+		JComboBox qtd = new JComboBox();
+		qtd.setModel(new DefaultComboBoxModel(new Double[] {1.0, 2.0, 3.0, 4.0, 5.0}));
+		qtd.setBounds(81, 36, 127, 22);
+		getContentPane().add(qtd);
+		
+		JLabel valorTotal = new JLabel("___");
+		valorTotal.setBounds(41, 78, 46, 14);
+		getContentPane().add(valorTotal);
+		
+		JButton btnNewButton = new JButton("Adicionar");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Connection conexao = null;
+				PreparedStatement comando = null;
+				
+				try {
+					conexao = ClasseConexao.Conectar();
+					String sql = "INSERT INTO pedidos(produto,quantidade,total) VALUES(?,?,?)";
+					comando = conexao.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+					comando.setString(1,(String) produto.getSelectedItem());
+					comando.setInt(2,qtd.getSelectedIndex());
+					Double valorProduto = 0.0;
+					switch (produto.getSelectedIndex()) {
+					case 0:
+						valorProduto = 8.25;
+						break;
+					case 1:
+						valorProduto = 10.50;
+						break;
+					case 2:
+						valorProduto = 12.00;
+						break;
+					case 3:
+						valorProduto = 1.50;
+						break;
+					case 4:
+						valorProduto = 25.00;
+						break;
+					default:
+						valorProduto = 0.00;
+					}
+					Double valorFinal = (valorProduto*(qtd.getSelectedIndex()+1));
+					valorTotal.setText(valorFinal.toString());
+					comando.setDouble(3, valorFinal);
+					
+					if(comando.executeUpdate()>0) {
+						JOptionPane.showMessageDialog(null, "Salvo");
+					}
+				}
+				catch(SQLException erro) {
+					erro.printStackTrace();
+				}
+				finally {
+					ClasseConexao.FecharConexao(conexao);
+					try {
+						comando.close();
+					}
+					catch(SQLException erro) {
+						erro.printStackTrace();
+					}
+				}
+			}
+		});
+		btnNewButton.setBounds(119, 74, 89, 23);
+		getContentPane().add(btnNewButton);
+
+	}
+}

@@ -1,0 +1,5 @@
+INDEX VERSION 1.131+C:\Users\SENAI\Downloads\Pedidos\.metadata\.plugins\org.eclipse.jdt.core
+2845835588.index
+3883950653.index
+1865797976.index
+1386101542.index

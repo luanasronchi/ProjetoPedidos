@@ -1,0 +1,80 @@
+
+
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+
+import net.proteanit.sql.DbUtils;
+
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.awt.event.ActionEvent;
+
+public class JanelaListagem {
+
+	private JFrame frame;
+	private JTable tabela1;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					JanelaListagem window = new JanelaListagem();
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the application.
+	 */
+	public JanelaListagem() {
+		initialize();
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		frame = new JFrame();
+		frame.setBounds(100, 100, 450, 300);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(null);
+		
+		tabela1 = new JTable();
+		tabela1.setBounds(10, 11, 414, 195);
+		frame.getContentPane().add(tabela1);
+		
+		JButton btnNewButton = new JButton("Listar");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Connection conexao = null;
+				PreparedStatement comando = null;
+				ResultSet rs;
+				conexao = ClasseConexao.Conectar();
+				String sql= "SELECT * FROM pedidos";
+				try {
+					comando = conexao.prepareStatement(sql);
+					rs = comando.executeQuery();
+					tabela1.setModel(DbUtils.resultSetToTableModel(rs));
+				}
+				catch(Exception erro){
+					JOptionPane.showMessageDialog(null, erro);
+				}
+			}
+		});
+		btnNewButton.setBounds(335, 227, 89, 23);
+		frame.getContentPane().add(btnNewButton);
+	}
+}
